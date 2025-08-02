@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Datei hochladen</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+  <div class="bg-white p-6 rounded shadow-md w-96">
+    <h2 class="text-2xl font-bold mb-4">Datei hochladen</h2>
+    <form id="uploadForm">
+      <input type="file" name="file" id="fileInput" class="mb-4 w-full" required />
+      <progress id="progressBar" value="0" max="100" class="w-full mb-4"></progress>
+      <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded w-full">Hochladen</button>
+    </form>
+    <p id="status" class="mt-4 text-center text-gray-700"></p>
+  </div>
+  <script>
+    const form = document.getElementById('uploadForm');
+    const progressBar = document.getElementById('progressBar');
+    const status = document.getElementById('status');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const file = document.getElementById('fileInput').files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/upload', true);
+
+      xhr.upload.onprogress = function (e) {
+        if (e.lengthComputable) {
+          const percent = (e.loaded / e.total) * 100;
+          progressBar.value = percent;
+        }
+      };
+
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          status.textContent = 'Upload erfolgreich!';
+        } else {
+          status.textContent = 'Fehler beim Upload!';
+        }
+      };
+
+      xhr.send(formData);
+    });
+  </script>
+</body>
+</html>
