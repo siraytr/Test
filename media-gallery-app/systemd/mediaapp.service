@@ -1,0 +1,17 @@
+[Unit]
+Description=Media Gallery App (Node.js)
+After=network.target mnt-media.mount
+Requires=mnt-media.mount
+
+[Service]
+User=mediaapp
+Group=mediaapp
+WorkingDirectory=/opt/media-gallery-app/server
+EnvironmentFile=/etc/mediaapp.env
+ExecStart=/usr/bin/node src/index.js
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=10000
+
+[Install]
+WantedBy=multi-user.target
