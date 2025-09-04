@@ -1,9 +1,0 @@
-[Unit]
-Description=Automount /mnt/media (automount unit)
-Before=remote-fs.target
-
-[Automount]
-Where=/mnt/media
-
-[Install]
-WantedBy=multi-user.target
