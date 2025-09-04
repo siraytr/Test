@@ -1,6 +1,0 @@
-# udev rule: wenn USB mit LABEL=MEDIA steckt, starte systemd automount
-# Datei: /etc/udev/rules.d/99-media-automount.rules
-ACTION=="add", SUBSYSTEM=="block", ENV{ID_FS_LABEL}=="MEDIA", TAG+="systemd",   ENV{SYSTEMD_WANTS}="mnt-media.automount"
-
-# Fallback auf UUID (ersetzen: XXXX-XXXX durch echte UUID falls genutzt)
-# ACTION=="add", SUBSYSTEM=="block", ENV{ID_FS_UUID}=="XXXX-XXXX", TAG+="systemd", #   ENV{SYSTEMD_WANTS}="mnt-media.automount"
