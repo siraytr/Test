@@ -1,0 +1,12 @@
+[Unit]
+Description=Mount USB Media to /mnt/media
+After=dev-disk-by\x2dlabel-MEDIA.device
+
+[Mount]
+What=/dev/disk/by-label/MEDIA
+Where=/mnt/media
+Type=auto
+Options=defaults,noexec,nodev,nosuid
+
+[Install]
+WantedBy=multi-user.target
