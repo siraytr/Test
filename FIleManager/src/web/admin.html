@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Admin Dashboard - NEXUS</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="card">
+    <h2>Admin Dashboard</h2>
+    <button id="logoutBtn" class="btn">Logout</button>
+  </div>
+
+  <div class="card">
+    <h3>Pending Requests</h3>
+    <div id="requestsArea"></div>
+  </div>
+
+  <div class="card">
+    <h3>Users</h3>
+    <div id="usersArea"></div>
+  </div>
+
+  <script>
+    async function loadRequests(){
+      const r = await fetch('/api/admin/requests'); const list = await r.json();
+      const area = document.getElementById('requestsArea'); area.innerHTML='';
+      list.forEach(it=>{
+        const el=document.createElement('div');
+        el.innerHTML=`${it.email} <button data-id="${it.id}">Approve</button>`;
+        el.querySelector('button').onclick=async()=>{
+          const res=await fetch('/api/admin/approve',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({requestId:it.id})});
+          const j=await res.json(); if(j.ok) alert(`Created user ${j.email}, pw: ${j.password}`); loadRequests(); loadUsers();
+        };
+        area.appendChild(el);
+      });
+    }
+
+    async function loadUsers(){
+      const r=await fetch('/api/admin/users'); const list=await r.json();
+      const area=document.getElementById('usersArea'); area.innerHTML='';
+      list.forEach(u=>{
+        const el=document.createElement('div');
+        el.innerHTML=`${u.email} ${u.is_admin?'(admin)':''} <input id="pw-${u.id}" placeholder="new password"><button data-id="${u.id}">Set</button>`;
+        el.querySelector('button').onclick=async()=>{
+          const newp=document.getElementById('pw-'+u.id).value;
+          if(!newp)return;
+          await fetch('/api/admin/change-user-password',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({userId:u.id,newPassword:newp})});
+          alert('Password set');
+        };
+        area.appendChild(el);
+      });
+    }
+
+    document.getElementById('logoutBtn').onclick=()=>fetch('/api/logout',{method:'POST'}).then(()=>location='/');
+    loadRequests(); loadUsers();
+  </script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>NEXUS | File Manager</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-icon"><i class="fas fa-folder"></i></div>
+      <div class="logo-text">NEXUS</div>
+    </div>
+    <a href="/" class="nav-item active"><div class="nav-icon"><i class="fas fa-home"></i></div><div>Home</div></a>
+    <a href="/gallery.html" class="nav-item"><div class="nav-icon"><i class="fas fa-images"></i></div><div>Gallery</div></a>
+    <a href="/login.html" class="nav-item"><div class="nav-icon"><i class="fas fa-sign-in-alt"></i></div><div>Login</div></a>
+  </div>
+
+  <div class="main-content">
+    <div class="header">
+      <h1 class="page-title">Welcome to NEXUS</h1>
+    </div>
+
+    <div class="card">
+      <h3>Request an account</h3>
+      <form id="requestForm">
+        <input name="name" placeholder="Your name" required>
+        <input name="email" placeholder="Email" type="email" required>
+        <textarea name="message" placeholder="Why do you need access?"></textarea>
+        <button class="btn" type="submit">Request Account</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>Upload a folder</h3>
+      <input id="folderInput" type="file" webkitdirectory directory multiple />
+      <input id="albumName" placeholder="Album name (optional)" />
+      <button id="uploadBtn" class="btn">Upload Folder</button>
+      <div id="uploadProgressArea"></div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+  <script>
+    const requestForm = document.getElementById('requestForm');
+    requestForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(requestForm);
+      const body = { name: fd.get('name'), email: fd.get('email'), message: fd.get('message') };
+      const r = await fetch('/api/request-account', { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify(body) });
+      if ((await r.json()).ok) alert('Request submitted.');
+    });
+
+    const socket = io();
+    const folderInput = document.getElementById('folderInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const uploadProgressArea = document.getElementById('uploadProgressArea');
+
+    uploadBtn.addEventListener('click', async () => {
+      if (!folderInput.files.length) return alert('Pick a folder first.');
+      const albumName = document.getElementById('albumName').value || '';
+      const formData = new FormData();
+      for (const f of folderInput.files) {
+        formData.append('files', f, f.webkitRelativePath || f.name);
+      }
+      formData.append('albumName', albumName);
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/upload-folder', true);
+      xhr.upload.onprogress = e => {
+        if (e.lengthComputable) {
+          const pct = Math.round((e.loaded / e.total) * 100);
+          uploadProgressArea.textContent = `Uploading... ${pct}%`;
+        }
+      };
+      xhr.onload = () => {
+        if (xhr.status === 200) uploadProgressArea.textContent = 'Upload queued. Processing...';
+        else alert('Upload failed');
+      };
+      xhr.send(formData);
+    });
+
+    socket.on('upload-complete', (data) => {
+      uploadProgressArea.textContent = `Upload complete: ${data.albumName}`;
+    });
+  </script>
+</body>
+</html>
