@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Login</title>
+<style>
+body { font-family: system-ui, Arial; display:flex; align-items:center; justify-content:center; height:100vh; }
+form { display:flex; flex-direction:column; gap:8px; width:320px; }
+input { padding:8px; font-size:16px; }
+button { padding:10px; font-size:16px; }
+.error { color:crimson }
+</style>
+</head>
+<body>
+<form id="loginForm">
+<h2>Please sign in</h2>
+<input id="username" name="username" placeholder="username" required />
+<input id="password" name="password" type="password" placeholder="password" required />
+<button type="submit">Sign in</button>
+<div class="error" id="error"></div>
+</form>
+
+
+<script>
+// Minimal: POST to /login and then redirect to /app on success
+const form = document.getElementById('loginForm');
+const err = document.getElementById('error');
+
+
+form.addEventListener('submit', async (e) => {
+e.preventDefault();
+err.textContent = '';
+const data = new URLSearchParams(new FormData(form));
+
+
+try {
+const res = await fetch('/login', {
+method: 'POST',
+headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+body: data
+});
+if (!res.ok) {
+const j = await res.json().catch(()=>({ error: 'Login failed' }));
+err.textContent = j.error || 'Login failed';
+return;
+}
+// success
+window.location.href = '/app';
+} catch (e) {
+err.textContent = 'Network error';
+}
+});
+</script>
+</body>
+</html>
