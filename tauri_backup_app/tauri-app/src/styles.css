@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Minimal visual polish */
+body { font-family: Inter, system-ui, -apple-system, "San Francisco", "Helvetica Neue", Arial; }
+.bg-surface { background: linear-gradient(180deg, rgba(250,250,250,0.6), rgba(245,245,247,0.6)); }
+.btn { padding: .5rem 1rem; border-radius: 12px; background: #007aff; color: white; border: none; }
+.btn-ghost { padding: .5rem 1rem; border-radius: 12px; background: transparent; color:#007aff; border: 1px solid rgba(0,122,255,0.15); }

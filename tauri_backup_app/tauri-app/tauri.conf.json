@@ -1,0 +1,10 @@
+{
+  "tauri": {
+    "bundle": {
+      "identifier": "com.example.tauri_backup"
+    },
+    "security": {
+      "csp": null
+    }
+  }
+}
